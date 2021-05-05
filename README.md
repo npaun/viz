@@ -1,7 +1,7 @@
 # viz
 prettier, faster and hopefully better GTFS visualizer.
 
-<img src="https://raw.githubusercontent.com/jsteelz/viz/master/docs/viz-screenshot.png" width="1000" />
+<img src="https://raw.githubusercontent.com/npaun/viz/master/docs/viz-screenshot.png" width="1000" />
 
 ## Requirements
 
