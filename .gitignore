@@ -1,0 +1,6 @@
+.visualizefiles/*
+.DS_store
+visualizer.html
+tools/__pycache__
+backend/lib
+js/config.js

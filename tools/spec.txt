@@ -1,0 +1,75 @@
+jviz data format.
+
+about: hastily conceptualized by a shitty programmer
+purpose: massage gtfs into a format that can be quickly visualized (<1s loading times) for even very large gtfses
+
+spec:
+
+folders:
+  itineraries
+  trips
+  trips_by_route_by_hour
+  service_jkeys_by_date
+  routes
+  shapes
+
+stops
+  one file: stops.json, a large object where
+  key: gtfs stop_id
+  values:
+    all gtfs-required stop attributes
+  
+  e.g.
+  { '1':
+    {
+      'stop_name': 'Metro station',
+      'location_type': '0',
+    },
+    ...
+  }
+
+shapes
+  one file per shape_jkey
+  filename: {shape_jkey}.geojson where shape_jkey is an md5 hash of gtfs shape_id
+    file is a geojson Feature of the shape
+
+routes
+  one file per route_jkey
+  filename: {route_jkey}.json where route_jkey is an md5 hash of gtfs route_id
+  attributes:
+    route_id (required)
+    route_type (required)
+    route_short_name (required if no route_long_name)
+    route_long_name (required if no route_short_name)
+
+service_jkeys_by_date
+  one file per active date in the gtfs
+  filename: {date}.json where date is formatted YYYYMMDD
+  each file contains an array of the service_jkeys active on that date, where service_jkey is an md5 hash of gtfs service_id
+
+trips
+  one file per trip_jkey
+  filename: {trip_jkey}.json where trip_jkey is an md5 hash of gtfs trip_id
+  attributes:
+    trip_headsign (optional)
+    other gtfs- and tgtfs-optional trip fields such as block_id
+    service_jkey REFERENCES service_jkeys_by_date (required)
+    route_jkey REFERENCES routes (required)
+    departure_time in HH:MM:SS (required)
+    itinerary_id REFERENCES itineraries (required)
+    timing_list: array containing the time offset in seconds from the departure time of the trip for each stop_time referenced in the gtfs stop_times.txt. Must be same length as stop_list of the itinerary_id referenced (required)
+
+itineraries
+  one folder per route_jkey
+  one file per itinerary in json format
+  filename: {itinerary_id}.json
+  attributes:
+    shape_jkey REFERENCES shapes (required)
+    stop_list: list of (stop_id, stop_lat, stop_lon) in order of gtfs stop_sequence (required)
+    
+trips_by_route_by_hour
+  one file per {service_jkey}_{route_jkey}
+  filename: {service_jkey}_{route_jkey}.json
+  file is a json object
+  keys: hour of the day
+  values: array of trip_jkeys active during that hour, for the service_jkey and route_jkey referenced in the filename
